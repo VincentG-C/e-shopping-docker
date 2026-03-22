@@ -1,0 +1,55 @@
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - target: 80
+        published: 80
+        protocol: tcp
+        mode: host
+    depends_on:
+      - auth
+      - order
+      - product
+    environment:
+      - PORT=8080
+      - MONGODB_URI=mongodb://127.0.0.1:27017/ecommerce
+      - JWT_SECRET=efrei_super_pass
+      - VITE_PRODUCT_SERVICE_URL=/api/product
+      - VITE_AUTH_SERVICE_URL=auth:/api/ingredere
+      - VITE_ORDER_SERVICE_URL=/api/order
+      - NODE_ENV=development
+
+
+  auth:
+    build: ./services/auth-service
+    depends_on:
+      - db
+    environment:
+      - MONGODB_URI=mongodb://db:27017/auth
+      - PORT=3001
+      - JWT_SECRET=efrei_super_pass
+      - NODE_ENV=development
+  order:
+    build: ./services/order-service
+    depends_on:
+      - db
+    environment:
+      - MONGODB_URI=mongodb://db:27017/orders
+      - JWT_SECRET=efrei_super_pass
+      - NODE_ENV=development
+  product:
+    build: ./services/product-service
+    depends_on:
+      - db
+    environment:
+      - MONGODB_URI=mongodb://db:27017/ecommerce
+      - JWT_SECRET=efrei_super_pass
+      - NODE_ENV=development
+  db:
+    image: mongo:8.2.6-noble
+    ports:
+      - target: 27017
+        published: 27017
+        protocol: tcp
+        mode: host
+

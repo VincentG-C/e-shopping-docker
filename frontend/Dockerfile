@@ -13,5 +13,6 @@ FROM base AS build
 RUN npm run build
 
 FROM nginx:1.29.6-alpine-slim AS prod
-WORKDIR /usr/local/apache2/htdocs/
+WORKDIR /usr/share/nginx/html
 COPY --from=build /web/dist .
+COPY nginx.conf /etc/nginx/conf.d/default.conf
