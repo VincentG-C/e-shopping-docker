@@ -3,6 +3,9 @@ WORKDIR /web
 COPY package.json .
 RUN npm install
 COPY . .
+RUN adduser -D -g '' elf
+RUN chown -R elf /web/src
+USER elf
 
 FROM base AS dev
 CMD ["npm", "run", "dev"]

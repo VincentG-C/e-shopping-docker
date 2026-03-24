@@ -2,3 +2,9 @@ node_modules
 package-lock.json
 .env
 .env.production
+Dockerfile
+.dockerignore
+desktop.ini
+.eslintrc.cjs
+.gitignore
+build-product.yml
