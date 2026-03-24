@@ -1,11 +1,11 @@
 services:
   frontend:
-    build: ./frontend
+    build: 
+      context: ./frontend
+      target: dev
     ports:
-      - target: 80
+      - target: 8080
         published: 80
-        protocol: tcp
-        mode: host
     depends_on:
       - auth-service
       - order-service
@@ -14,42 +14,72 @@ services:
       - PORT=8080
       - MONGODB_URI=mongodb://127.0.0.1:27017/ecommerce
       - JWT_SECRET=${JWT_SECRET}
-      - VITE_PRODUCT_SERVICE_URL=/api/product
-      - VITE_AUTH_SERVICE_URL=auth:/api/auth
-      - VITE_ORDER_SERVICE_URL=/api/order
-      - NODE_ENV=production
+      - VITE_PRODUCT_SERVICE_URL=http://product-service:3000
+      - VITE_AUTH_SERVICE_URL=http://auth-service:3001
+      - VITE_ORDER_SERVICE_URL=http://order-service:3002
+      - NODE_ENV=development
+    volumes:
+      - ./frontend:/web
+      - /web/node_modules
+    networks:
+      - ecommerce-network
 
   auth-service:
-    build: ./services/auth-service
+    build: 
+      context: ./services/auth-service
+      target: dev
     depends_on:
       - db
+    volumes:
+      - ./services/auth-service:/web
+      - /web/node_modules
     environment:
       - MONGODB_URI=mongodb://db:27017/auth
       - PORT=3001
       - JWT_SECRET=${JWT_SECRET}
-      - NODE_ENV=production
+      - NODE_ENV=development
+    networks:
+      - ecommerce-network
   order-service:
-    build: ./services/order-service
+    build: 
+      context: ./services/order-service
+      target: dev
     depends_on:
       - db
+    volumes:
+      - ./services/order-service:/web
+      - /web/node_modules
     environment:
       - MONGODB_URI=mongodb://db:27017/orders
       - JWT_SECRET=${JWT_SECRET}
-      - NODE_ENV=production
+      - NODE_ENV=development
       - PORT=3002
+    networks:
+      - ecommerce-network
   product-service:
-    build: ./services/product-service
+    build: 
+      context: ./services/product-service
+      target: dev
+    volumes:
+      - ./services/product-service:/web
+      - /web/node_modules
     depends_on:
       - db
+    networks:
+      - ecommerce-network
     environment:
       - PORT=3000
       - MONGODB_URI=mongodb://db:27017/ecommerce
       - JWT_SECRET=${JWT_SECRET}
-      - NODE_ENV=production
+      - NODE_ENV=development
   db:
     image: mongo:8.2.6-noble
     ports:
       - target: 27017
         published: 27017
-        protocol: tcp
-        mode: host
+    networks:
+      - ecommerce-network
+
+networks:
+  ecommerce-network:
+    driver: bridge

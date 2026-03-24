@@ -1,0 +1,51 @@
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - target: 80
+        published: 80
+        protocol: tcp
+        mode: host
+    depends_on:
+      - auth-service
+      - order-service
+      - product-service
+    environment:
+      - MONGODB_URI=mongodb://127.0.0.1:27017/ecommerce
+      - JWT_SECRET=${JWT_SECRET}
+      - NODE_ENV=production
+
+  auth-service:
+    build: ./services/auth-service
+    depends_on:
+      - db
+    environment:
+      - MONGODB_URI=mongodb://db:27017/auth
+      - PORT=3001
+      - JWT_SECRET=${JWT_SECRET}
+      - NODE_ENV=production
+  order-service:
+    build: ./services/order-service
+    depends_on:
+      - db
+    environment:
+      - MONGODB_URI=mongodb://db:27017/orders
+      - JWT_SECRET=${JWT_SECRET}
+      - NODE_ENV=production
+      - PORT=3002
+  product-service:
+    build: ./services/product-service
+    depends_on:
+      - db
+    environment:
+      - PORT=3000
+      - MONGODB_URI=mongodb://db:27017/ecommerce
+      - JWT_SECRET=${JWT_SECRET}
+      - NODE_ENV=production
+  db:
+    image: mongo:8.2.6-noble
+    ports:
+      - target: 27017
+        published: 27017
+        protocol: tcp
+        mode: host

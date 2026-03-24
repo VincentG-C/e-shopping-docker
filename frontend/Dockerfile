@@ -6,6 +6,8 @@ COPY . .
 
 FROM base AS dev
 RUN adduser -D -g '' elf
+RUN chown -R elf /web/src
+RUN chown elf /web /web/node_modules
 USER elf
 CMD ["npm", "run", "dev"]
 
