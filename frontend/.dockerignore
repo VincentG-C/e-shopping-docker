@@ -3,3 +3,10 @@ node_modules
 dist
 .env
 .env.production
+.npmrc
+build-front.yml
+Dockerfile
+desktop.ini
+package-lock.json
+README.md
+.vscode
